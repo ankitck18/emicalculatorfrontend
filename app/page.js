@@ -16,7 +16,6 @@ export default function Home() {
     term: "",
     start_date: "",
     payment_amount: 0,
-    annual_payments: 12,
     interest_only_period: 0,
     days_convention: daysConventionOptions[0],
   });
@@ -32,6 +31,7 @@ export default function Home() {
 
     const payload = {
       ...form,
+      annual_payments: 12, // Hardcoded
       compounding_method: daysConventionMap[form.days_convention],
     };
 
@@ -113,31 +113,49 @@ export default function Home() {
               !["days_convention", "payment_amount", "interest_only_period"].includes(
                 key
               ) && (
-                <div key={key} className="flex flex-col flex-1 min-w-[140px]">
+                <div key={key} className="flex flex-col flex-1 min-w-[140px] relative">
                   <label
                     htmlFor={key}
                     className="text-gray-700 font-medium mb-1"
                   >
-                    {key
-                      .replace("_", " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    {key === "principal"
+                      ? "Loan Amount"
+                      : key === "rate"
+                      ? "Interest Rate"
+                      : key === "term"
+                      ? "Term"
+                      : key
+                          .replace("_", " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                   </label>
                   <input
                     id={key}
                     type={
                       key === "start_date"
                         ? "date"
-                        : ["principal", "rate", "term", "annual_payments"].includes(
-                            key
-                          )
+                        : ["principal", "rate", "term"].includes(key)
                         ? "number"
                         : "text"
                     }
                     name={key}
                     value={form[key]}
                     onChange={handleChange}
-                    className="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-gray-700"
+                    className={`border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-gray-700 ${
+                      key === "rate" ? "pr-8" : key === "term" ? "pr-14" : ""
+                    }`}
                   />
+                  {/* % sign for interest rate */}
+                  {key === "rate" && (
+                    <span className="absolute right-3 top-[38px] text-gray-500 font-medium">
+                      %
+                    </span>
+                  )}
+                  {/* years label for term */}
+                  {key === "term" && (
+                    <span className="absolute right-3 top-[38px] text-gray-500 font-medium">
+                      years
+                    </span>
+                  )}
                 </div>
               )
           )}
